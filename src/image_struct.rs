@@ -4,6 +4,7 @@ use std::io::BufReader;
 use std::io::BufRead;
 use std::io::Read;
 use std::str::FromStr;
+use std::borrow::BorrowMut;
 
 
     
@@ -32,7 +33,7 @@ impl Pixel{
     }
 
     fn display(&self)-> String{
-        return format!("{}-{}-{}", &self.r, &self.g,&self.b);
+        return format!("{}-{}-{}", self.r, self.g,self.b);
     }
 
     fn invert(&mut self){
@@ -72,7 +73,7 @@ impl Image {
         return Image {
                 height : *h,
                 width : *w,
-                pixels : vec![Pixel::init(); w*h]
+                pixels : Vec::new()
         }
     }
 
@@ -86,10 +87,13 @@ impl Image {
             let mut img : Image = Image {
                 height : 0,
                 width : 0,
-                pixels : vec![Pixel::init(); 0]
+                pixels : Vec::new()
             };
 
             let mut buf_reader = BufReader::new(file);
+            let mut i : usize = 0;
+            let mut h : usize = 0;
+            let mut w : usize = 0;
             for line in buf_reader.lines() {
                 let l = line.unwrap();
                 if getCharsAtIndex(&l, 0)!='#'{
@@ -107,32 +111,41 @@ impl Image {
                             }
                         },
                         2 => {
-                            let h : usize = usize::from_str(vec[1]).unwrap();
-                            let w : usize = usize::from_str(vec[0]).unwrap();
+                            h = usize::from_str(vec[1]).unwrap();
+                            w = usize::from_str(vec[0]).unwrap();
 
                             img = Image {
                                 height : h,
                                 width : w,
-                                pixels : vec![Pixel::init(); w*h]
+                                pixels : Vec::new()
                             };
                             init = true;
                             println!("Init ")
                         },
                         _ => {
                             if init == true {
-                            let r : u8 = u8::from_str(vec[0]).unwrap();
-                            let g : u8 = u8::from_str(vec[1]).unwrap();
-                            let b : u8 = u8::from_str(vec[2]).unwrap();
-                            
-                            let mut pix : Pixel = Pixel::new(r,g,b);
-                            println!("pix {} ", pix.display());
-                            img.pixels.push(pix);
+                                if i<h*w {
+                                    let r : u8 = u8::from_str(vec[0]).unwrap();
+                                    let g : u8 = u8::from_str(vec[1]).unwrap();
+                                    let b : u8 = u8::from_str(vec[2]).unwrap();
+                                    
+                                    let mut pix : Pixel = Pixel::new(r,g,b);
+                                    println!("pix {} ", pix.display());
+                                    img.pixels.push(pix);
+                                    println!("pixels : {:?} ", img.pixels);
+                                }
+                            i = i+1;
                             }else{
                                 panic!("The image wasn't initialize");
                             }
                         }
 
                     }
+                }
+            }
+            if i<w*h {
+                for _ in i..img.pixels.len() {
+                img.pixels.push(Pixel::init());
                 }
             }
             return img;
