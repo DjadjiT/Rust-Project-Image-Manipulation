@@ -2,11 +2,10 @@ use std::path::Path;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::BufRead;
-use std::io::Read;
 use std::str::FromStr;
-use std::borrow::BorrowMut;
-
-
+use std::iter::Iterator;
+use std::io::Read;
+use std::io::Write;
     
 #[derive(Clone, Debug, Copy)]
 pub struct Pixel{
@@ -33,7 +32,7 @@ impl Pixel{
     }
 
     fn display(&self)-> String{
-        return format!("{}-{}-{}", self.r, self.g,self.b);
+        return format!("{} {} {} ", self.r, self.g,self.b);
     }
 
     fn invert(&mut self){
@@ -91,7 +90,6 @@ impl Image {
             };
 
             let mut buf_reader = BufReader::new(file);
-            let mut i : usize = 0;
             let mut h : usize = 0;
             let mut w : usize = 0;
             for line in buf_reader.lines() {
@@ -120,21 +118,19 @@ impl Image {
                                 pixels : Vec::new()
                             };
                             init = true;
-                            println!("Init ")
+                            println!("Init with size {} x {}", w, h);
                         },
                         _ => {
                             if init == true {
-                                if i<h*w {
-                                    let r : u8 = u8::from_str(vec[0]).unwrap();
-                                    let g : u8 = u8::from_str(vec[1]).unwrap();
-                                    let b : u8 = u8::from_str(vec[2]).unwrap();
-                                    
-                                    let mut pix : Pixel = Pixel::new(r,g,b);
-                                    println!("pix {} ", pix.display());
-                                    img.pixels.push(pix);
-                                    println!("pixels : {:?} ", img.pixels);
-                                }
-                            i = i+1;
+                                    for x in (0..vec.len()).step_by(3) {
+                                        let r : u8 = u8::from_str(vec[x as usize]).unwrap();
+                                        let g : u8 = u8::from_str(vec[x+1 as usize]).unwrap();
+                                        let b : u8 = u8::from_str(vec[x+2 as usize]).unwrap();
+                                        
+                                        let mut pix : Pixel = Pixel::new(r,g,b);
+                                        img.pixels.push(pix);
+                                        
+                                    }
                             }else{
                                 panic!("The image wasn't initialize");
                             }
@@ -143,32 +139,47 @@ impl Image {
                     }
                 }
             }
-            if i<w*h {
-                for _ in i..img.pixels.len() {
-                img.pixels.push(Pixel::init());
-                }
-            }
             return img;
         }
         else {
-            return Image {
-                height : 0,
-                width : 0,
-                pixels : vec![Pixel::init(); 0]
+            panic!("can't load image !");
         }
+    }
+        
+    pub fn save(&self, filename: &Path){
+        if filename.extension().unwrap()!="ppm" {
+            panic!("Wront extension for the file !");
+        }
+        let format : String = String::from("P3 \n");
+        let dimension : String = format!("{} {} \n", &self.width, &self.height);
+        let max_pix_color_value : String = String::from("255 \n");
+        let mut file = match File::create(&filename) {
+            Err(e) => panic!("couldn't create file : {}", e),
+            Ok(file) => file,
+        };
+        
+        file.write_all(format.as_bytes());
+        file.write_all(dimension.as_bytes());
+        file.write_all(max_pix_color_value.as_bytes());
+        
+        for i in 0..self.height {
+            for j in 0..self.width {
+                file.write_all(self.getPixel(i as usize, j as usize).display().as_bytes());
+            }
+            file.write_all(b"\n");
         }
     }
 
     pub fn toString(&self){
         for i in 0..self.height{
             for j in 0..self.width{
-                print!("{:?} - ", self.getPixel(&i, &j).display());
+                print!("{:?} - ", self.getPixel(i, j).display());
             }
             println!("");
         }
     }
 
-    pub fn getPixel(&self, x : &usize, y : &usize) -> Pixel{
+    pub fn getPixel(&self, x : usize, y : usize) -> Pixel{
         let index : usize = self.width*x+y;
         return self.pixels[index];
     }
