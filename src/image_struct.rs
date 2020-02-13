@@ -41,10 +41,7 @@ impl Pixel{
     }
 
     fn greyscale(&mut self){
-        let r : u16 = self.r as u16;
-        let g : u16 = self.g as u16;
-        let b : u16 = self.b as u16;
-        let average : u16 = (r+g+b)/3;
+        let average : u16 = (self.r as u16+self.g as u16+self.b as u16)/3;
         self.r = average as u8;
         self.g = average as u8;
         self.b = average as u8;
@@ -53,13 +50,9 @@ impl Pixel{
 
 impl PartialEq for Pixel{
     fn eq(&self, other : &Pixel) -> bool{
-        if self.r == other.r &&
+        self.r == other.r &&
         self.b == other.b &&
-        self.g == other.g {
-            return true;
-        }else {
-            return false;
-        }
+        self.g == other.g
     }
 }
 
@@ -124,14 +117,14 @@ impl Image {
                         },
                         _ => {
                             if init == true {
-                                    for x in (0..vec.len()).step_by(3) {
-                                        let r : u8 = u8::from_str(vec[x as usize]).unwrap();
-                                        let g : u8 = u8::from_str(vec[x+1 as usize]).unwrap();
-                                        let b : u8 = u8::from_str(vec[x+2 as usize]).unwrap();
-                                        
-                                        let mut pix : Pixel = Pixel::new(r,g,b);
-                                        img.pixels.push(pix);
-                                        
+                                for x in (0..vec.len()).step_by(3) {
+                                    let r : u8 = u8::from_str(vec[x as usize]).unwrap();
+                                    let g : u8 = u8::from_str(vec[x+1 as usize]).unwrap();
+                                    let b : u8 = u8::from_str(vec[x+2 as usize]).unwrap();
+                                    
+                                    let mut pix : Pixel = Pixel::new(r,g,b);
+                                    img.pixels.push(pix);
+                                    
                                     }
                             }else{
                                 return None;
@@ -144,7 +137,7 @@ impl Image {
             return Some(img);
         }
         else {
-            panic!("can't load image !");
+            return None;
         }
     }
         
