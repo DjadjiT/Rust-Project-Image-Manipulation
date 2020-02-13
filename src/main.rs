@@ -3,7 +3,6 @@ use std::path::Path;
 
 fn main(){
     let pathPPM = Path::new("test.ppm");
-    let pathTXT = Path::new("test.txt");
     let mut img = Image::new_with_file(pathPPM).unwrap();
     let mut img2 = Image::new_with_file(pathPPM).unwrap();
 
