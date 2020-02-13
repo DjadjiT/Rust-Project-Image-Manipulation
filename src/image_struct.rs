@@ -14,7 +14,7 @@ pub struct Pixel{
 }
 
 impl Pixel{
-    fn init() -> Pixel {
+    pub fn init() -> Pixel {
         return Pixel{
             r:0,
             g:0,
@@ -22,7 +22,7 @@ impl Pixel{
         }
     }
 
-    fn new(red: u8, green: u8, blue: u8) -> Pixel {
+    pub fn new(red: u8, green: u8, blue: u8) -> Pixel {
         return Pixel{
             r:red,
             g:green,
@@ -30,17 +30,17 @@ impl Pixel{
         }
     }
 
-    fn display(&self)-> String{
+    pub fn display(&self)-> String{
         return format!("{} {} {} ", self.r, self.g,self.b);
     }
 
-    fn invert(&mut self){
+    pub fn invert(&mut self){
         self.r = 255-&self.r;
         self.g = 255-&self.g;
         self.b = 255-&self.b;
     }
 
-    fn greyscale(&mut self){
+    pub fn greyscale(&mut self){
         let average : u16 = (self.r as u16+self.g as u16+self.b as u16)/3;
         self.r = average as u8;
         self.g = average as u8;
