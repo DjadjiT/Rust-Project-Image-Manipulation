@@ -40,7 +40,7 @@ impl Pixel{
         self.b = 255-&self.b;
     }
 
-    fn greyScale(&mut self){
+    fn greyscale(&mut self){
         let r : u16 = self.r as u16;
         let g : u16 = self.g as u16;
         let b : u16 = self.b as u16;
@@ -78,11 +78,11 @@ impl Image {
         }
     }
 
-    pub fn new_with_file(filename: &Path) -> Image {
+    pub fn new_with_file(filename: &Path) -> Option<Image> {
         if filename.is_file() && filename.extension().unwrap()=="ppm" {
             let mut init : bool = false;
             let mut file = match File::open(&filename) {
-                Err(e) => panic!("couldn't open file : {}", e),
+                Err(e) => return None,
                 Ok(file) => file,
             };
             let mut img : Image = Image {
@@ -106,7 +106,7 @@ impl Image {
                             }else {
                                 println!("maximum value for each color : {} ", vec[0]);
                                 if u8::from_str(vec[0]).unwrap()>255 {
-                                    panic!("The maximum value for the color is too big!");
+                                    return None;
                                 }
                             }
                         },
@@ -134,14 +134,14 @@ impl Image {
                                         
                                     }
                             }else{
-                                panic!("The image wasn't initialize");
+                                return None;
                             }
                         }
 
                     }
                 }
             }
-            return img;
+            return Some(img);
         }
         else {
             panic!("can't load image !");
@@ -186,9 +186,9 @@ impl Image {
         return self.pixels[index];
     }
 
-    pub fn grey_scale(&mut self){
+    pub fn greyscale(&mut self){
         for x in 0..self.pixels.len(){
-            self.pixels[x].greyScale();
+            self.pixels[x].greyscale();
         }
     }
 
@@ -221,11 +221,11 @@ mod tests {
     }
 
     #[test]
-    pub fn greyScale_test() {
+    pub fn greyscale_test() {
         let mut pixel_a : Pixel = Pixel::new(255, 255, 0);
         let pixel_b : Pixel = Pixel::new(170, 170, 170);
 
-        pixel_a.greyScale();
+        pixel_a.greyscale();
 
         assert!(pixel_a.eq(&pixel_b));
     }

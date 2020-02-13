@@ -4,13 +4,14 @@ use std::path::Path;
 fn main(){
     let pathPPM = Path::new("test.ppm");
     let pathTXT = Path::new("test.txt");
-    let mut img = Image::new_with_file(pathPPM);
+    let mut img = Image::new_with_file(pathPPM).unwrap();
+    let mut img2 = Image::new_with_file(pathPPM).unwrap();
 
     img.to_string();
     println!("invert the image");
     img.invert();
     img.to_string();
     println!("Greyscale the image");
-    img.grey_scale();
-    img.to_string();
+    img2.greyscale();
+    img2.to_string();
 }
