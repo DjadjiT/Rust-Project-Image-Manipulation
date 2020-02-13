@@ -2,10 +2,15 @@ use projectRust::image_struct::Image;
 use std::path::Path;
 
 fn main(){
-    let pathPPM = Path::new("mandelbrot.ppm");
+    let pathPPM = Path::new("test.ppm");
     let pathTXT = Path::new("test.txt");
-    let img = Image::new_with_file(pathPPM);
-    let imgtxt = Image::new_with_file(pathTXT);
+    let mut img = Image::new_with_file(pathPPM);
 
-    img.toString();
+    img.to_string();
+    println!("invert the image");
+    img.invert();
+    img.to_string();
+    println!("Greyscale the image");
+    img.grey_scale();
+    img.to_string();
 }

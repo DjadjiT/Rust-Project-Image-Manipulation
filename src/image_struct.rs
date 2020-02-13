@@ -4,7 +4,6 @@ use std::io::BufReader;
 use std::io::BufRead;
 use std::str::FromStr;
 use std::iter::Iterator;
-use std::io::Read;
 use std::io::Write;
     
 #[derive(Clone, Debug, Copy)]
@@ -42,10 +41,13 @@ impl Pixel{
     }
 
     fn greyScale(&mut self){
-        let average : u8 = (&self.r+&self.g+&self.b)/3;
-        self.r = average;
-        self.g = average;
-        self.b = average;
+        let r : u16 = self.r as u16;
+        let g : u16 = self.g as u16;
+        let b : u16 = self.b as u16;
+        let average : u16 = (r+g+b)/3;
+        self.r = average as u8;
+        self.g = average as u8;
+        self.b = average as u8;
     }
 }
 
@@ -89,17 +91,17 @@ impl Image {
                 pixels : Vec::new()
             };
 
-            let mut buf_reader = BufReader::new(file);
+            let buf_reader = BufReader::new(file);
             let mut h : usize = 0;
             let mut w : usize = 0;
             for line in buf_reader.lines() {
                 let l = line.unwrap();
-                if getCharsAtIndex(&l, 0)!='#'{
+                if get_chars_at_index(&l, 0)!='#'{
                     let strList = l.split_whitespace();
                     let vec = strList.collect::<Vec<&str>>();
                     match vec.len() {
                         1 => {
-                            if getCharsAtIndex(&String::from(vec[0]), 0)=='P' {
+                            if get_chars_at_index(&String::from(vec[0]), 0)=='P' {
                                 println!("Format : {}", vec[0]);
                             }else {
                                 println!("maximum value for each color : {} ", vec[0]);
@@ -164,27 +166,27 @@ impl Image {
         
         for i in 0..self.height {
             for j in 0..self.width {
-                file.write_all(self.getPixel(i as usize, j as usize).display().as_bytes());
+                file.write_all(self.get_pixel(i as usize, j as usize).display().as_bytes());
             }
             file.write_all(b"\n");
         }
     }
 
-    pub fn toString(&self){
+    pub fn to_string(&self){
         for i in 0..self.height{
             for j in 0..self.width{
-                print!("{:?} - ", self.getPixel(i, j).display());
+                print!("{:?} - ", self.get_pixel(i, j).display());
             }
             println!("");
         }
     }
 
-    pub fn getPixel(&self, x : usize, y : usize) -> Pixel{
+    pub fn get_pixel(&self, x : usize, y : usize) -> Pixel{
         let index : usize = self.width*x+y;
         return self.pixels[index];
     }
 
-    pub fn greyScale(&mut self){
+    pub fn grey_scale(&mut self){
         for x in 0..self.pixels.len(){
             self.pixels[x].greyScale();
         }
@@ -198,7 +200,7 @@ impl Image {
 
 }
 
-fn getCharsAtIndex(my_string : &String, index :usize) -> char{
+fn get_chars_at_index(my_string : &String, index :usize) -> char{
     match my_string.chars().nth(index) {
         Some(c) => return c,
         None => panic!("No character at index : {}", index)
@@ -209,12 +211,22 @@ fn getCharsAtIndex(my_string : &String, index :usize) -> char{
 mod tests {
     use super::*;
     #[test]
-    pub fn PixelCreation() {
-        let mut pixelA : Pixel = Pixel::new(0, 0, 0);
-        let pixelB : Pixel = Pixel::new(255, 255, 255);
+    pub fn pixel_inversion() {
+        let mut pixel_a : Pixel = Pixel::new(0, 0, 0);
+        let pixel_b : Pixel = Pixel::new(255, 255, 255);
 
-        pixelA.invert();
+        pixel_a.invert();
 
-        assert!(pixelA.eq(&pixelB));
+        assert!(pixel_a.eq(&pixel_b));
+    }
+
+    #[test]
+    pub fn greyScale_test() {
+        let mut pixel_a : Pixel = Pixel::new(255, 255, 0);
+        let pixel_b : Pixel = Pixel::new(170, 170, 170);
+
+        pixel_a.greyScale();
+
+        assert!(pixel_a.eq(&pixel_b));
     }
 }
