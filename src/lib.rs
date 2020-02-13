@@ -7,3 +7,4 @@ use image_struct::Pixel;
 fn dummy() -> i32{
     return 42
 }
+
