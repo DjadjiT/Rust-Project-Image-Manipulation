@@ -1,4 +1,4 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use projectRust::image_struct::Pixel;
 use projectRust::image_struct::Image;
 use std::path::Path;
@@ -23,19 +23,15 @@ pub fn pixel_inversion() {
 
 fn create_image(){
     let path_ppm = Path::new("test.ppm");
-    let mut img = Image::new_with_file(path_ppm).unwrap();
+    let img = Image::new_with_file(path_ppm).unwrap();
 
 }
 
-fn invert_image(){
-    let path_ppm = Path::new("test.ppm");
-    let mut img = Image::new_with_file(path_ppm).unwrap();
+fn invert_image(img : &mut Image){
     img.invert();
 }
 
-fn greyscale_image(){
-    let path_ppm = Path::new("test.ppm");
-    let mut img = Image::new_with_file(path_ppm).unwrap();
+fn greyscale_image(img : &mut Image){
     img.greyscale();
 
 }
@@ -58,11 +54,15 @@ fn create_image_benchmark(c: &mut Criterion) {
 }
 
 fn invert_image_benchmark(c: &mut Criterion) {
-    c.bench_function("invert image", |b| b.iter(|| invert_image()));
+    let path_ppm = Path::new("test.ppm");
+    let mut img = Image::new_with_file(path_ppm).unwrap();
+    c.bench_function("invert image", |b| b.iter(|| invert_image(&mut img)));
 }
 
 fn greyscale_image_benchmark(c: &mut Criterion) {
-    c.bench_function("greyscale image", |b| b.iter(|| greyscale_image()));
+    let path_ppm = Path::new("test.ppm");
+    let mut img = Image::new_with_file(path_ppm).unwrap();
+    c.bench_function("greyscale image", |b| b.iter(|| greyscale_image(&mut img)));
 }
 
 
