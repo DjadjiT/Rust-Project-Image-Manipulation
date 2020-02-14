@@ -68,7 +68,7 @@ impl PartialEq for Pixel{
 pub struct Image {
     height : usize,
     width : usize,
-    pixels : Vec<Pixel>,
+    pub pixels : Vec<Pixel>,
 }
 
 impl Image {
@@ -239,23 +239,5 @@ mod tests {
         pixel_a.greyscale();
 
         assert!(pixel_a.eq(&pixel_b));
-    }
-
-    #[test]
-    fn new_with_file_test() {
-        let mut img : Image = Image::new(3 as usize, 2 as usize);
-        
-    }
-
-    #[test]
-    fn img_greyscale_test() {
-        let mut img : Image = Image::new(3 as usize, 2 as usize);
-        
-    }
-
-    #[test]
-    fn img_invert_test() {
-        let mut img : Image = Image::new(3 as usize, 2 as usize);
-        
     }
 }
